@@ -1,204 +1,207 @@
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace JasperFx.Reflection
+namespace JasperFx.Reflection;
+
+public static class ReflectionExtensions
 {
-    public static class ReflectionExtensions
+    public static T? GetAttribute<T>(this MemberInfo provider) where T : Attribute
     {
-        public static T? GetAttribute<T>(this MemberInfo provider) where T : Attribute
+        var atts = provider.GetCustomAttributes(typeof(T), true);
+        return atts.FirstOrDefault() as T;
+    }
+
+    public static T? GetAttribute<T>(this Assembly provider) where T : Attribute
+    {
+        var atts = provider.GetCustomAttributes(typeof(T));
+        return atts.FirstOrDefault() as T;
+    }
+
+    public static T? GetAttribute<T>(this Module provider) where T : Attribute
+    {
+        var atts = provider.GetCustomAttributes(typeof(T));
+        return atts.FirstOrDefault() as T;
+    }
+
+    public static T? GetAttribute<T>(this ParameterInfo provider) where T : Attribute
+    {
+        var atts = provider.GetCustomAttributes(typeof(T), true);
+        return atts.FirstOrDefault() as T;
+    }
+
+    public static IEnumerable<T> GetAllAttributes<T>(this Assembly provider) where T : Attribute
+    {
+        return provider.GetCustomAttributes(typeof(T)).OfType<T>();
+    }
+
+    public static IEnumerable<T> GetAllAttributes<T>(this MemberInfo provider) where T : Attribute
+    {
+        return provider.GetCustomAttributes(typeof(T), true).OfType<T>();
+    }
+
+    public static IEnumerable<T> GetAllAttributes<T>(this Module provider) where T : Attribute
+    {
+        return provider.GetCustomAttributes(typeof(T)).OfType<T>();
+    }
+
+    public static IEnumerable<T> GetAllAttributes<T>(this ParameterInfo provider) where T : Attribute
+    {
+        return provider.GetCustomAttributes(typeof(T), true).OfType<T>();
+    }
+
+    public static bool HasAttribute<T>(this Assembly provider) where T : Attribute
+    {
+        return provider.IsDefined(typeof(T));
+    }
+
+    public static bool HasAttribute<T>(this MemberInfo provider) where T : Attribute
+    {
+        return provider.IsDefined(typeof(T), true);
+    }
+
+    public static bool HasAttribute<T>(this Module provider) where T : Attribute
+    {
+        return provider.IsDefined(typeof(T));
+    }
+
+    public static bool HasAttribute<T>(this ParameterInfo provider) where T : Attribute
+    {
+        return provider.IsDefined(typeof(T), true);
+    }
+
+    public static void ForAttribute<T>(this Assembly provider, Action<T> action) where T : Attribute
+    {
+        foreach (var attribute in provider.GetAllAttributes<T>()) action(attribute);
+    }
+
+    public static void ForAttribute<T>(this MemberInfo provider, Action<T> action) where T : Attribute
+    {
+        foreach (var attribute in provider.GetAllAttributes<T>()) action(attribute);
+    }
+
+    public static void ForAttribute<T>(this Module provider, Action<T> action) where T : Attribute
+    {
+        foreach (var attribute in provider.GetAllAttributes<T>()) action(attribute);
+    }
+
+    public static void ForAttribute<T>(this ParameterInfo provider, Action<T> action) where T : Attribute
+    {
+        foreach (var attribute in provider.GetAllAttributes<T>()) action(attribute);
+    }
+
+    public static void ForAttribute<T>(this Assembly provider, Action<T> action, Action elseDo)
+        where T : Attribute
+    {
+        var found = false;
+        foreach (var attribute in provider.GetAllAttributes<T>())
         {
-            var atts = provider.GetCustomAttributes(typeof (T), true);
-            return atts.FirstOrDefault() as T;
+            action(attribute);
+            found = true;
         }
 
-        public static T? GetAttribute<T>(this Assembly provider) where T : Attribute
+        if (!found)
         {
-            var atts = provider.GetCustomAttributes(typeof(T));
-            return atts.FirstOrDefault() as T;
+            elseDo();
+        }
+    }
+
+    public static void ForAttribute<T>(this MemberInfo provider, Action<T> action, Action elseDo)
+        where T : Attribute
+    {
+        var found = false;
+        foreach (var attribute in provider.GetAllAttributes<T>())
+        {
+            action(attribute);
+            found = true;
         }
 
-        public static T? GetAttribute<T>(this Module provider) where T : Attribute
+        if (!found)
         {
-            var atts = provider.GetCustomAttributes(typeof(T));
-            return atts.FirstOrDefault() as T;
+            elseDo();
+        }
+    }
+
+    public static void ForAttribute<T>(this Module provider, Action<T> action, Action elseDo)
+        where T : Attribute
+    {
+        var found = false;
+        foreach (var attribute in provider.GetAllAttributes<T>())
+        {
+            action(attribute);
+            found = true;
         }
 
-        public static T? GetAttribute<T>(this ParameterInfo provider) where T : Attribute
+        if (!found)
         {
-            var atts = provider.GetCustomAttributes(typeof(T), true);
-            return atts.FirstOrDefault() as T;
+            elseDo();
+        }
+    }
+
+    public static void ForAttribute<T>(this ParameterInfo provider, Action<T> action, Action elseDo)
+        where T : Attribute
+    {
+        var found = false;
+        foreach (var attribute in provider.GetAllAttributes<T>())
+        {
+            action(attribute);
+            found = true;
         }
 
-        public static IEnumerable<T> GetAllAttributes<T>(this Assembly provider) where T : Attribute
+        if (!found)
         {
-            return provider.GetCustomAttributes(typeof(T)).OfType<T>();
+            elseDo();
+        }
+    }
+
+
+    /// <summary>
+    ///     Does a .Net type have a default, no arg constructor
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns></returns>
+    public static bool HasDefaultConstructor(this Type t)
+    {
+        return t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+            null, Type.EmptyTypes, null) != null;
+    }
+
+    // http://stackoverflow.com/a/15273117/426840
+    /// <summary>
+    ///     Is the object an anonymous type that is not within a .Net
+    ///     namespace. See http://stackoverflow.com/a/15273117/426840
+    /// </summary>
+    /// <param name="instance"></param>
+    /// <returns></returns>
+    public static bool IsAnonymousType(this object? instance)
+    {
+        if (instance == null)
+        {
+            return false;
         }
 
-        public static IEnumerable<T> GetAllAttributes<T>(this MemberInfo provider) where T : Attribute
+        return instance.GetType().Namespace == null;
+    }
+
+    /// <summary>
+    ///     Get a user readable, "pretty" type name for a given type. Corrects for
+    ///     generics and inner classes
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns></returns>
+    public static string GetPrettyName(this Type t)
+    {
+        if (!t.GetTypeInfo().IsGenericType)
         {
-            return provider.GetCustomAttributes(typeof(T), true).OfType<T>();
+            return t.Name;
         }
 
-        public static IEnumerable<T> GetAllAttributes<T>(this Module provider) where T : Attribute
-        {
-            return provider.GetCustomAttributes(typeof(T)).OfType<T>();
-        }
+        var sb = new StringBuilder();
 
-        public static IEnumerable<T> GetAllAttributes<T>(this ParameterInfo provider) where T : Attribute
-        {
-            return provider.GetCustomAttributes(typeof(T), true).OfType<T>();
-        }
+        sb.Append(t.Name.Substring(0, t.Name.LastIndexOf("`", StringComparison.Ordinal)));
+        sb.Append(t.GetGenericArguments().Aggregate("<",
+            (aggregate, type) => aggregate + (aggregate == "<" ? "" : ",") + GetPrettyName(type)));
+        sb.Append('>');
 
-        public static bool HasAttribute<T>(this Assembly provider) where T : Attribute
-        {
-            return provider.IsDefined(typeof(T));
-        }
-
-        public static bool HasAttribute<T>(this MemberInfo provider) where T : Attribute
-        {
-            return provider.IsDefined(typeof(T), true);
-        }
-
-        public static bool HasAttribute<T>(this Module provider) where T : Attribute
-        {
-            return provider.IsDefined(typeof(T));
-        }
-
-        public static bool HasAttribute<T>(this ParameterInfo provider) where T : Attribute
-        {
-            return provider.IsDefined(typeof(T), true);
-        }
-
-        public static void ForAttribute<T>(this Assembly provider, Action<T> action) where T : Attribute
-        {
-            foreach (T attribute in provider.GetAllAttributes<T>())
-            {
-                action(attribute);
-            }
-        }
-
-        public static void ForAttribute<T>(this MemberInfo provider, Action<T> action) where T : Attribute
-        {
-            foreach (T attribute in provider.GetAllAttributes<T>())
-            {
-                action(attribute);
-            }
-        }
-
-        public static void ForAttribute<T>(this Module provider, Action<T> action) where T : Attribute
-        {
-            foreach (T attribute in provider.GetAllAttributes<T>())
-            {
-                action(attribute);
-            }
-        }
-
-        public static void ForAttribute<T>(this ParameterInfo provider, Action<T> action) where T : Attribute
-        {
-            foreach (T attribute in provider.GetAllAttributes<T>())
-            {
-                action(attribute);
-            }
-        }
-
-        public static void ForAttribute<T>(this Assembly provider, Action<T> action, Action elseDo)
-            where T : Attribute
-        {
-            var found = false;
-            foreach (T attribute in provider.GetAllAttributes<T>())
-            {
-                action(attribute);
-                found = true;
-            }
-
-            if (!found) elseDo();
-        }
-
-        public static void ForAttribute<T>(this MemberInfo provider, Action<T> action, Action elseDo)
-            where T : Attribute
-        {
-            var found = false;
-            foreach (T attribute in provider.GetAllAttributes<T>())
-            {
-                action(attribute);
-                found = true;
-            }
-
-            if (!found) elseDo();
-        }
-
-        public static void ForAttribute<T>(this Module provider, Action<T> action, Action elseDo)
-            where T : Attribute
-        {
-            var found = false;
-            foreach (T attribute in provider.GetAllAttributes<T>())
-            {
-                action(attribute);
-                found = true;
-            }
-
-            if (!found) elseDo();
-        }
-
-        public static void ForAttribute<T>(this ParameterInfo provider, Action<T> action, Action elseDo)
-            where T : Attribute
-        {
-            var found = false;
-            foreach (T attribute in provider.GetAllAttributes<T>())
-            {
-                action(attribute);
-                found = true;
-            }
-
-            if (!found) elseDo();
-        }
-
-
-        /// <summary>
-        /// Does a .Net type have a default, no arg constructor
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
-        public static bool HasDefaultConstructor(this Type t)
-        {
-            return t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null) != null;
-        }
-        
-        // http://stackoverflow.com/a/15273117/426840
-        /// <summary>
-        /// Is the object an anonymous type that is not within a .Net
-        /// namespace. See http://stackoverflow.com/a/15273117/426840
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <returns></returns>
-        public static bool IsAnonymousType(this object? instance)
-        {
-            if (instance == null)
-                return false;
-
-            return instance.GetType().Namespace == null;
-        }
-        
-        /// <summary>
-        /// Get a user readable, "pretty" type name for a given type. Corrects for
-        /// generics and inner classes
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
-        public static string GetPrettyName(this Type t)
-        {
-            if (!t.GetTypeInfo().IsGenericType)
-                return t.Name;
-
-            var sb = new StringBuilder();
-
-            sb.Append(t.Name.Substring(0, t.Name.LastIndexOf("`", StringComparison.Ordinal)));
-            sb.Append(t.GetGenericArguments().Aggregate("<",
-                (aggregate, type) => aggregate + (aggregate == "<" ? "" : ",") + GetPrettyName(type)));
-            sb.Append('>');
-
-            return sb.ToString();
-        }
+        return sb.ToString();
     }
 }
