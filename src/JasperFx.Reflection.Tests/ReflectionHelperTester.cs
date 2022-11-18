@@ -53,13 +53,6 @@ public class ReflectionHelperTester
         convertExpression.GetMemberExpression(false).ToString().ShouldBe("t.Child");
     }
 
-    [Fact]
-    public void getMemberExpression_should_throw_when_not_a_member_access()
-    {
-        Expression<Func<Target, object>> typeAsExpression = t => t.Child;
-        Should.Throw<ArgumentException>(() => typeAsExpression.GetMemberExpression(true)).Message
-            .ShouldContain("Not a member access");
-    }
 
     [Fact]
     public void Try_to_fetch_a_method()
