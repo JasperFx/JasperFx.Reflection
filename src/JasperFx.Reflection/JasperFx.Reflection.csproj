@@ -4,6 +4,20 @@
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+
+        <Description>Reflection helpers</Description>
+        <Version>0.9.0</Version>
+        <Authors>Jeremy D. Miller</Authors>
+        <AssemblyName>JasperFx.Reflection</AssemblyName>
+        <PackageId>JasperFx.Reflection</PackageId>
+        <PackageProjectUrl>https://github.com/JasperFX/JasperFx.Reflection</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/JasperFX/JasperFx.Reflection/blob/master/LICENSE</PackageLicenseUrl>
+        <PackageIconUrl>https://github.com/JasperFx/oakton/blob/master/documentation/content/images/title.png?raw=true</PackageIconUrl>
+        <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+        <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+        <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+        <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+
     </PropertyGroup>
 
 </Project>
