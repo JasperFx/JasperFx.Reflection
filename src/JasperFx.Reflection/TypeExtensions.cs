@@ -425,11 +425,6 @@ public static class TypeExtensions
     }
 
 
-    public static Type? DeriveElementType(this Type type)
-    {
-        return type.GetElementType() ?? type.GetGenericArguments().FirstOrDefault();
-    }
-
     public static Type IsAnEnumerationOf(this Type type)
     {
         if (!type.Closes(typeof(IEnumerable<>)))
@@ -503,3 +498,4 @@ public static class TypeExtensions
         return (type != null && type.IsGenericType) && _tupleTypes.Contains(type.GetGenericTypeDefinition());
     }
 }
+
