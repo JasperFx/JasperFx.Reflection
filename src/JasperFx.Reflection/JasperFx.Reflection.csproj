@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
 
         <Description>Reflection helpers</Description>
-        <Version>0.9.2</Version>
+        <Version>0.9.3</Version>
         <Authors>Jeremy D. Miller</Authors>
         <AssemblyName>JasperFx.Reflection</AssemblyName>
         <PackageId>JasperFx.Reflection</PackageId>
